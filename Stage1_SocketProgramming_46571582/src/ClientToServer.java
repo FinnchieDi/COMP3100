@@ -1,4 +1,7 @@
-import java.net.*;  
+import java.net.*;
+
+import javax.swing.ToolTipManager;
+
 import java.io.*; 
 public class ClientToServer {
     Socket sct;
@@ -7,6 +10,13 @@ public class ClientToServer {
 
     String lastMsg = "";
     int jobNum = 0;
+    String redyString;
+    String[] redyPieces = new String[7];
+    String dataString;
+    String[] dataPieces = new String[3];
+    String largestServerType = "";
+    int serverNum = 0;
+    int totalServers = 0;
 
 
     //Constructor for defining the Server's IP and Port Address
@@ -38,32 +48,37 @@ public class ClientToServer {
 
         //Beginning system operations
         while (lastMsg != "NONE"){
-            if (jobNum == 0){
-                transmitMsg("REDY");
-                System.out.println("Server responds: " + this.inputStream.readLine());
-                String redyString = this.inputStream.readLine();
-                String redyPieces[] = redyString.split("@", 5);
+            
+            transmitMsg("REDY");
+            System.out.println("Server responds: " + this.inputStream.readLine());
+            redyString = this.inputStream.readLine();
+            String redyPieces[] = redyString.split("@", 7);
 
+            if (jobNum == 0){
                 transmitMsg("GETS All");
                 System.out.println("Server responds: " + this.inputStream.readLine());
-                String dataString = this.inputStream.readLine();
+                dataString = this.inputStream.readLine();
                 String dataPieces[] = dataString.split("@", 3);
                 System.out.println("DATA " + dataPieces[0] + " nRecs " + dataPieces[1] + " recLen " + dataPieces[2] + "\n");
+                totalServers = Integer.parseInt(dataPieces[1]);
+
 
                 transmitMsg("OK");
-
-                for (int i = 0; i < Integer.parseInt(dataPieces[1]); i++){
+                for (int i = 0; i < totalServers; i++){
                     //Receive each record
                     //Keep track of the largest server type and the number of servers of that type
-
+                    System.out.println("Server responds: " + this.inputStream.readLine());
                 }
+            }
 
-                transmitMsg("OK");
-                System.out.println("Server responds: " + this.inputStream.readLine());
+            transmitMsg("OK");
+            System.out.println("Server responds: " + this.inputStream.readLine());
 
-                if (redyPieces[0] == "JOBN"){
-                    //Schedule a job
-                }
+            if (redyPieces[0] == "JOBN"){
+                //Schedule a job
+                transmitMsg("SCHD " + jobNum + " " + largestServerType + " " + serverNum);
+                jobNum += 1;
+                serverNum = (serverNum+1)%totalServers;
             }
         
         }
