@@ -37,22 +37,38 @@ public class ClientToServer {
         System.out.println("Server responds: " + this.inputStream.readLine());
 
         //Beginning system operations
-        //while (lastMsg != "NONE"){
+        while (lastMsg != "NONE"){
             if (jobNum == 0){
                 transmitMsg("REDY");
                 System.out.println("Server responds: " + this.inputStream.readLine());
+                String redyString = this.inputStream.readLine();
+                String redyPieces[] = redyString.split("@", 5);
 
                 transmitMsg("GETS All");
-                String dataString = this.inputStream.readLine();
                 System.out.println("Server responds: " + this.inputStream.readLine());
-
+                String dataString = this.inputStream.readLine();
                 String dataPieces[] = dataString.split("@", 3);
                 System.out.println("DATA " + dataPieces[0] + " nRecs " + dataPieces[1] + " recLen " + dataPieces[2] + "\n");
+
+                transmitMsg("OK");
+
+                for (int i = 0; i < Integer.parseInt(dataPieces[1]); i++){
+                    //Receive each record
+                    //Keep track of the largest server type and the number of servers of that type
+
+                }
+
+                transmitMsg("OK");
+                System.out.println("Server responds: " + this.inputStream.readLine());
+
+                if (redyPieces[0] == "JOBN"){
+                    //Schedule a job
+                }
             }
         
-        //}
-
+        }
         //Closing the connection
+        System.out.println("Server says: "+ this.inputStream.readLine());
         transmitMsg("QUIT");
         System.out.println("Server says: "+ this.inputStream.readLine());
     }
