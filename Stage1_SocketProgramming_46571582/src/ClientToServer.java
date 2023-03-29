@@ -8,11 +8,11 @@ public class ClientToServer {
     String lastMsg = "";
     int jobNum = 0;
     String redyString;
-    String[] redyPieces = new String[7];
+    String[] redyPieces = null;
     String dataString;
-    String[] dataPieces = new String[3];
+    String[] dataPieces = null;
     String recordString;
-    String[] recordPieces = new String [9];
+    String[] recordPieces = null;
     String largestServerType = "";
     int serverNum = 0;
     int totalServers = 0;
@@ -49,15 +49,16 @@ public class ClientToServer {
         while (lastMsg != "NONE"){
             
             transmitMsg("REDY");
-            System.out.println("Server responds: " + this.inputStream.readLine());
             redyString = this.inputStream.readLine();
-            String redyPieces[] = redyString.split("@", 7);
+            lastMsg = redyString;
+            System.out.println("Server responds: " + redyString);
+            String redyPieces[] = redyString.split(" ");
 
             if (jobNum == 0){
                 transmitMsg("GETS All");
-                System.out.println("Server responds: " + this.inputStream.readLine());
                 dataString = this.inputStream.readLine();
-                String dataPieces[] = dataString.split("@", 3);
+                System.out.println("Server responds: " + dataString);
+                String dataPieces[] = dataString.split(" ");
                 System.out.println("DATA " + dataPieces[0] + " nRecs " + dataPieces[1] + " recLen " + dataPieces[2] + "\n");
                 totalServers = Integer.parseInt(dataPieces[1]);
 
@@ -66,11 +67,16 @@ public class ClientToServer {
 
                 for (int i = 0; i < totalServers; i++){
                     //Receive each record
-                    System.out.println("Server responds: " + this.inputStream.readLine());
                     recordString = this.inputStream.readLine();
-                    String recordPieces[] = redyString.split("@", 7);
+                    System.out.println("Server responds: " + recordString);
+                    String recordPieces[] = redyString.split(" ");
                     //Keep track of the largest server type and the number of servers of that type
+                    largestServerType = recordPieces[4];
                 }
+                if (largestServerType.equals("16")){
+                    largestServerType = "xlarge";
+                }
+                
             }
 
             transmitMsg("OK");
@@ -81,13 +87,12 @@ public class ClientToServer {
                 transmitMsg("SCHD " + jobNum + " " + largestServerType + " " + serverNum);
                 jobNum += 1;
                 serverNum = (serverNum+1)%totalServers;
+                System.out.println("Server responds: "+ this.inputStream.readLine());
             }
-        
         }
         //Closing the connection
-        System.out.println("Server says: "+ this.inputStream.readLine());
         transmitMsg("QUIT");
-        System.out.println("Server says: "+ this.inputStream.readLine());
+        System.out.println("Server responds: "+ this.inputStream.readLine());
     }
 
     public void transmitMsg(String message) throws Exception{
