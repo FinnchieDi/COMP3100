@@ -24,6 +24,23 @@ public class ClientToServer {
     }
 
     public void ClientConnect () throws Exception{
+        //Sending initial message
+        transmitMsg("HELO");
+        System.out.println("Server responds: " + this.inputStream.readLine());
+        
+        //transmitting authentication
+        String username = System.getProperty("user.name");
+        transmitMsg("AUTH " + username);
+        System.out.println("Server responds: " + this.inputStream.readLine());
 
+        
+
+        //Closing the connection
+        transmitMsg("QUIT");
+        System.out.println("Server says: "+ this.inputStream.readLine());
+    }
+
+    public void transmitMsg(String message) throws Exception{
+        this.outputStream.write( (message + "\n").getBytes("UTF-8"));
     }
 }
