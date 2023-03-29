@@ -37,7 +37,7 @@ public class ClientToServer {
         System.out.println("Server responds: " + this.inputStream.readLine());
 
         //Beginning system operations
-        while (lastMsg != "NONE"){
+        //while (lastMsg != "NONE"){
             if (jobNum == 0){
                 transmitMsg("REDY");
                 System.out.println("Server responds: " + this.inputStream.readLine());
@@ -45,12 +45,12 @@ public class ClientToServer {
                 transmitMsg("GETS All");
                 String dataString = this.inputStream.readLine();
                 System.out.println("Server responds: " + this.inputStream.readLine());
-                String[] dataPieces = new String[3];
-                dataPieces = dataString.split(dataString);
-                System.out.println("DATA " + dataPieces[0] + " nRecs " + dataPieces[1] + " recLen " + dataPieces[2]);
+
+                String dataPieces[] = dataString.split("@", 3);
+                System.out.println("DATA " + dataPieces[0] + " nRecs " + dataPieces[1] + " recLen " + dataPieces[2] + "\n");
             }
         
-        }
+        //}
 
         //Closing the connection
         transmitMsg("QUIT");
