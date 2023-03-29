@@ -1,7 +1,4 @@
 import java.net.*;
-
-import javax.swing.ToolTipManager;
-
 import java.io.*; 
 public class ClientToServer {
     Socket sct;
@@ -14,6 +11,8 @@ public class ClientToServer {
     String[] redyPieces = new String[7];
     String dataString;
     String[] dataPieces = new String[3];
+    String recordString;
+    String[] recordPieces = new String [9];
     String largestServerType = "";
     int serverNum = 0;
     int totalServers = 0;
@@ -27,7 +26,7 @@ public class ClientToServer {
     }
 
     public static void main(String[] args) throws Exception{
-        ClientToServer client = new ClientToServer("192.168.0.122", 50000);
+        ClientToServer client = new ClientToServer("10.126.139.160", 50000);
         //running the server operation
         client.ClientConnect();
         //closing the connection between client and server
@@ -64,10 +63,13 @@ public class ClientToServer {
 
 
                 transmitMsg("OK");
+
                 for (int i = 0; i < totalServers; i++){
                     //Receive each record
-                    //Keep track of the largest server type and the number of servers of that type
                     System.out.println("Server responds: " + this.inputStream.readLine());
+                    recordString = this.inputStream.readLine();
+                    String recordPieces[] = redyString.split("@", 7);
+                    //Keep track of the largest server type and the number of servers of that type
                 }
             }
 
