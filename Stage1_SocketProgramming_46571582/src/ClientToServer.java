@@ -48,7 +48,7 @@ public class ClientToServer {
         System.out.println("Server responds: " + this.inputStream.readLine());
 
         //Beginning system operations
-        while ( jobNum <= 5/*!lastMsg.equals("NONE")*/){
+        while (jobNum <= 5/*!lastMsg.equals("NONE") || !lastMsg.equals("ERR")*/){
             
             transmitMsg("REDY");
             //Server replies with "JOBN" or "NONE"
@@ -91,10 +91,11 @@ public class ClientToServer {
                 if (largestServerType.equals("16")){
                     largestServerType = "xlarge";
                 }
-            }
-            transmitMsg("OK");
-            System.out.println("Server responds: " + this.inputStream.readLine());
 
+                transmitMsg("OK");
+            System.out.println("Server responds: " + this.inputStream.readLine());
+            }
+        
             if (redyPieces[0].equals("JOBN")){
                 //Schedule a job
                 transmitMsg("SCHD " + jobNum + " " + largestServerType + " " + serverNum);
@@ -102,9 +103,6 @@ public class ClientToServer {
                 jobNum += 1;
                 serverNum = (serverNum+1)%totalServers;
                 System.out.println("Server responds: "+ this.inputStream.readLine());
-                
-                transmitMsg("OK");
-                System.out.println("Server responds: " + this.inputStream.readLine());
             }
         }
         //Closing the connection
