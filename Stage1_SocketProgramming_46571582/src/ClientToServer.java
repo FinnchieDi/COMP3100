@@ -48,7 +48,7 @@ public class ClientToServer {
         System.out.println("Server responds: " + this.inputStream.readLine());
 
         //Beginning system operations
-        while (jobNum <= 5/*!lastMsg.equals("NONE") || !lastMsg.equals("ERR")*/){
+        while (/*jobNum <= 10*/!lastMsg.equals("NONE") || !lastMsg.equals("ERR: ")){
             
             transmitMsg("REDY");
             //Server replies with "JOBN" or "NONE"
@@ -70,7 +70,7 @@ public class ClientToServer {
                 String dataPieces[] = dataString.split(" ");
                 System.out.println("DATA: " + dataPieces[0] + " nRecs: " + dataPieces[1] + " recLen: " + 
                                     dataPieces[2] + "\n");
-                totalServers = Integer.parseInt(dataPieces[1]);
+                totalServers = Integer.parseInt("10");/*Integer.parseInt(dataPieces[1]);*/
 
 
                 transmitMsg("OK");
