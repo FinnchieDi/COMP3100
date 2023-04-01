@@ -96,20 +96,23 @@ public class ClientToServer {
                     String currCores = recordPieces[4];
                     String currLargestST = recordPieces[0];
                     
+                    //Finding the total servers of the Largest Server Type
                     if (largestServerType.equals(currLargestST)){
                         largestServerTotal ++;
                     }else{
                         largestServerTotal = 1;
                     }
 
+                    //finding the largest server type based on cores
                     if (!largestCores.equals(currCores)){
                         largestCores = currCores;
                         largestServerType = currLargestST;
                     }
+                    
                 }
 
                 transmitMsg("OK");
-            System.out.println("Server responds: " + this.inputStream.readLine());
+                System.out.println("Server responds: " + this.inputStream.readLine());
             }
         
             if (redyPieces[0].equals("JOBN")){
