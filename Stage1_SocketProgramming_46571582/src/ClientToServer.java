@@ -16,7 +16,7 @@ public class ClientToServer {
     String largestServerType = "";
     int serverNum = 0;
     int totalServers = 0;
-
+    int largestServerTotal = 0;
 
     //Constructor for defining the Server's IP and Port Address
     public ClientToServer(String ip, int port) throws Exception{
@@ -48,15 +48,21 @@ public class ClientToServer {
         System.out.println("Server responds: " + this.inputStream.readLine());
 
         //Beginning system operations
-        while (/*jobNum <= 10*/!lastMsg.equals("NONE") || !lastMsg.equals("ERR: ")){
+        while (!lastMsg.equals("NONE")){
             
             transmitMsg("REDY");
-            //Server replies with "JOBN" or "NONE"
+            //Server replies with "JOBN", "JCPL" or "NONE"
             redyString = this.inputStream.readLine();
             System.out.println("Server responds: " + redyString);
             String redyPieces[] = redyString.split(" ");
             lastMsg = redyPieces[0];
             System.out.println("lastMessage = " + lastMsg);
+
+            if (lastMsg.equals("JCPL")){
+                continue;
+            }else if (lastMsg.equals("NONE")){
+                break;
+            }
 
             if (jobNum == 0){
                 
@@ -70,7 +76,7 @@ public class ClientToServer {
                 String dataPieces[] = dataString.split(" ");
                 System.out.println("DATA: " + dataPieces[0] + " nRecs: " + dataPieces[1] + " recLen: " + 
                                     dataPieces[2] + "\n");
-                totalServers = Integer.parseInt("10");/*Integer.parseInt(dataPieces[1]);*/
+                totalServers = Integer.parseInt(dataPieces[1]);/*Integer.parseInt(dataPieces[1]);*/
 
 
                 transmitMsg("OK");
@@ -85,11 +91,9 @@ public class ClientToServer {
                     //                     recordPieces[3] + " core: " + recordPieces[4] + " memory: " + recordPieces[5] + 
                     //                     " disk: " + recordPieces[6] + " #wJobs: " + recordPieces[7] + " #rJobs: " + recordPieces[8]);
                     //Keep track of the largest server type and the number of servers of that type
-                    largestServerType = recordPieces[4];
-
-                }
-                if (largestServerType.equals("16")){
                     largestServerType = "xlarge";
+                    largestServerTotal = 10;
+
                 }
 
                 transmitMsg("OK");
@@ -101,9 +105,11 @@ public class ClientToServer {
                 transmitMsg("SCHD " + jobNum + " " + largestServerType + " " + serverNum);
                 System.out.println("Scheduled Server: " + largestServerType + ", JobNo " + jobNum + ", ServerID " + serverNum);
                 jobNum += 1;
-                serverNum = (serverNum+1)%totalServers;
+                serverNum = (serverNum+1)%largestServerTotal;
                 System.out.println("Server responds: "+ this.inputStream.readLine());
             }
+
+            
         }
         //Closing the connection
         transmitMsg("QUIT");
