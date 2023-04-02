@@ -14,7 +14,7 @@ public class ClientToServer {
     String recordString;
     String[] recordPieces = null;
     String largestServerType = "";
-    String largestCores = " ";
+    int largestCores = 0;
     int serverNum = 0;
     int totalServers = 0;
     int largestServerTotal = 0;
@@ -95,22 +95,21 @@ public class ClientToServer {
                     //                     recordPieces[3] + " core: " + recordPieces[4] + " memory: " + recordPieces[5] + 
                     //                     " disk: " + recordPieces[6] + " #wJobs: " + recordPieces[7] + " #rJobs: " + recordPieces[8]);
                     //Keep track of the largest server type and the number of servers of that type
-                    String currCores = recordPieces[4];
+                    int currCores = Integer.parseInt(recordPieces[4]);
                     String currLargestST = recordPieces[0];
                     
-                    //Finding the total servers of the Largest Server Type
-                    if (largestServerType.equals(currLargestST)){
-                        largestServerTotal ++;
-                    }else{
-                        largestServerTotal = 1;
-                    }
 
                     //finding the largest server type based on cores
-                    if (!largestCores.equals(currCores)){
-                        largestCores = currCores;
-                        largestServerType = currLargestST;
+                    if (largestCores != currCores){
+                        if (largestCores < currCores){
+                            largestCores = currCores;
+                            largestServerType = currLargestST;
+                            largestServerTotal = 1;
+                        }
+                    }else if (largestServerType.equals(currLargestST)){
+                        //Finding the total servers of the Largest Server Type
+                        largestServerTotal ++;
                     }
-                    
                 }
 
                 transmitMsg("OK");
