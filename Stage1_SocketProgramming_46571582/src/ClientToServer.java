@@ -94,10 +94,10 @@ public class ClientToServer {
                     //                     " disk: " + recordPieces[6] + " #wJobs: " + recordPieces[7] + " #rJobs: " + recordPieces[8]);
                     //Keep track of the largest server type and the number of servers of that type
                     String currCores = recordPieces[4];
-                    String currLargestST = recordPieces[0];
+                    String currST = recordPieces[0];
                     
                     //Finding the total servers of the Largest Server Type
-                    if (largestServerType.equals(currLargestST)){
+                    if (largestServerType.equals(currST)){
                         largestServerTotal ++;
                     }else{
                         largestServerTotal = 1;
@@ -106,7 +106,7 @@ public class ClientToServer {
                     //finding the largest server type based on cores
                     if (!largestCores.equals(currCores)){
                         largestCores = currCores;
-                        largestServerType = currLargestST;
+                        largestServerType = currST;
                     }
                     
                 }
