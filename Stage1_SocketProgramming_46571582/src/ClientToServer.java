@@ -96,6 +96,7 @@ public class ClientToServer {
                     //Keep track of the largest server type and the number of servers of that type
                     String currCores = recordPieces[4];
                     String currST = recordPieces[0];
+                    
                     //Finding the total servers of the Largest Server Type
                     if (largestServerType.equals(currST)){
                         largestServerTotal ++;
