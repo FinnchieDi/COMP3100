@@ -72,7 +72,7 @@ public class ClientToServer {
                 String dataPieces[] = dataString.split(" ");
                 totalServers = Integer.parseInt(dataPieces[1]);
 
-
+                //Send OK to recieve the list of Servers
                 transmitMsg("OK");
 
                 for (int i = 0; i < totalServers; i++){
