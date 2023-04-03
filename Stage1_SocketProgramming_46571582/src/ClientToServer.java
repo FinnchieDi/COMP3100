@@ -6,7 +6,6 @@ public class ClientToServer {
     BufferedReader inputStream;
 
     String lastMsg = "";
-    int jobNum = 0;
     String redyString;
     String[] redyPieces = null;
     String dataString;
@@ -14,6 +13,7 @@ public class ClientToServer {
     String recordString;
     String[] recordPieces = null;
     String largestServerType = "";
+    int jobNum = 0;
     int largestCores = 0;
     int serverNum = 0;
     int totalServers = 0;
@@ -28,10 +28,11 @@ public class ClientToServer {
     }
 
     public static void main(String[] args) throws Exception{
-        ClientToServer client = new ClientToServer("192.168.0.122", 50000);
-        //running the server operation
+        ClientToServer client = new ClientToServer("10.126.68.115", 50000);
+        //Running the server operation
         client.ClientConnect();
-        //closing the connection between client and server
+        
+        //Closing the connection between client and server
         client.sct.close();
         client.inputStream.close();
         client.outputStream.close();
@@ -42,14 +43,12 @@ public class ClientToServer {
         transmitMsg("HELO");
         //Server replies with "OK"
         this.inputStream.readLine();
-        //System.out.println("Server responds: " + this.inputStream.readLine());
         
         //transmitting authentication
         String username = System.getProperty("user.name");
         transmitMsg("AUTH " + username);
         //Server replies with "OK"
         this.inputStream.readLine();
-        //System.out.println("Server responds: " + this.inputStream.readLine());
 
         //Beginning system operations
         while (!lastMsg.equals("NONE")){
@@ -57,29 +56,20 @@ public class ClientToServer {
             transmitMsg("REDY");
             //Server replies with "JOBN", "JCPL" or "NONE"
             redyString = this.inputStream.readLine();
-            //System.out.println("Server responds: " + redyString);
             String redyPieces[] = redyString.split(" ");
             lastMsg = redyPieces[0];
-            //System.out.println("lastMessage = " + lastMsg);
 
             if (lastMsg.equals("JCPL")){
+                //Need to say REDY again, skip through the rest of the loop
                 continue;
-            }else if (lastMsg.equals("NONE")){
-                break;
             }
 
             if (jobNum == 0){
-                
-                // System.out.println("Job Type: " + redyPieces[0] + " submitType: " + redyPieces[1] + 
-                //                 " jobID: " + redyPieces[2] + " estRuntime: " + redyPieces[3] + 
-                //                 " core: " + redyPieces[4] + " memory: " + redyPieces[5] + " disk: " + redyPieces[6]);
 
+                //Recieve information regarding the server list
                 transmitMsg("GETS All");
                 dataString = this.inputStream.readLine();
-                //System.out.println("Server responds: " + dataString);
                 String dataPieces[] = dataString.split(" ");
-                // System.out.println("DATA: " + dataPieces[0] + " nRecs: " + dataPieces[1] + " recLen: " + 
-                //                     dataPieces[2] + "\n");
                 totalServers = Integer.parseInt(dataPieces[1]);
 
 
@@ -88,20 +78,18 @@ public class ClientToServer {
                 for (int i = 0; i < totalServers; i++){
                     //Receive each record
                     recordString = this.inputStream.readLine();
-                    //System.out.println("Server responds: " + recordString);
                     String recordPieces[] = recordString.split(" ");
-                    // System.out.println("serverType: " + recordPieces[0] + " serverID: " + recordPieces[1] + 
-                    //                     " serverStatus: " + recordPieces[2] + " currentStartTime: " + 
-                    //                     recordPieces[3] + " core: " + recordPieces[4] + " memory: " + recordPieces[5] + 
-                    //                     " disk: " + recordPieces[6] + " #wJobs: " + recordPieces[7] + " #rJobs: " + recordPieces[8]);
+
                     //Keep track of the largest server type and the number of servers of that type
                     int currCores = Integer.parseInt(recordPieces[4]);
                     String currLargestST = recordPieces[0];
-                    
 
-                    //finding the largest server type based on cores
+                    //Finding the largest server type based on cores
                     if (largestCores != currCores){
                         if (largestCores < currCores){
+                            //If the cores are larger than the already defined larger, 
+                            //switch them around and reset the count of total servers in
+                            //the largest server type.
                             largestCores = currCores;
                             largestServerType = currLargestST;
                             largestServerTotal = 1;
@@ -111,28 +99,25 @@ public class ClientToServer {
                         largestServerTotal ++;
                     }
                 }
-
+                //Send the OK message
                 transmitMsg("OK");
+                //Get the "." in return
                 this.inputStream.readLine();
-                //System.out.println("Server responds: " + this.inputStream.readLine());
             }
         
-            if (redyPieces[0].equals("JOBN")){
+            if (lastMsg.equals("JOBN")){
                 //Schedule a job
                 transmitMsg("SCHD " + jobNum + " " + largestServerType + " " + serverNum);
-                //System.out.println("Scheduled Server: " + largestServerType + ", JobNo " + jobNum + ", ServerID " + serverNum);
+                //Increment Job Number and Server ID
                 jobNum += 1;
+                //When incrementing serverNum, be sure to wrap the count back to "0" when you reach the last server
                 serverNum = (serverNum+1)%largestServerTotal;
                 this.inputStream.readLine();
-                //System.out.println("Server responds: "+ this.inputStream.readLine());
             }
-
-            
         }
         //Closing the connection
         transmitMsg("QUIT");
         this.inputStream.readLine();
-        //System.out.println("Server responds: "+ this.inputStream.readLine());
     }
 
     public void transmitMsg(String message) throws Exception{
