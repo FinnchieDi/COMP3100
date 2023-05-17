@@ -28,7 +28,7 @@ public class ClientToServer {
     }
 
     public static void main(String[] args) throws Exception{
-        ClientToServer client = new ClientToServer("10.126.68.115", 50000);
+        ClientToServer client = new ClientToServer("localhost", 50000);
         //Running the server operation
         client.ClientConnect();
         
@@ -87,9 +87,9 @@ public class ClientToServer {
                     //Finding the largest server type based on cores
                     if (largestCores != currCores){
                         if (largestCores < currCores){
-                            //If the cores are larger than the already defined larger, 
-                            //switch them around and reset the count of total servers in
-                            //the largest server type.
+                            /*If the cores are larger than the already defined larger, 
+                            switch them around and reset the count of total servers in
+                            the largest server type.*/
                             largestCores = currCores;
                             largestServerType = currLargestST;
                             largestServerTotal = 1;
