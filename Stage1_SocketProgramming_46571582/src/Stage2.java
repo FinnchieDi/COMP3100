@@ -210,4 +210,3 @@ public class Stage2 {
         this.outputStream.write( (message + "\n").getBytes("UTF-8"));
     }
 }
-
