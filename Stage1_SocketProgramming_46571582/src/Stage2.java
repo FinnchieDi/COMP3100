@@ -62,21 +62,27 @@ public class Stage2 {
 
             if (lastMsg.equals("JCPL")) {
                 // Need to say REDY again, skip through the rest of the loop
-                transmitMsg("LTSQ GQ #");
+                transmitMsg("LSTQ GQ #");
                 String listTotalString = this.inputStream.readLine();
                 String listTotalPieces[] = listTotalString.split("");
                 int listTotal = Integer.parseInt(listTotalPieces[0]);
 
-                if (listTotal == 0){
+                if (listTotal == 0) {
+                    isNotAvail = false;
                     continue;
-                }else{
+                } else {
                     transmitMsg("DEQJ GQ 0");
                     isNotAvail = false;
+                    this.inputStream.readLine();
+                    continue;
                 }
 
             }
             if (lastMsg.equals("NONE")) {
                 break;
+            }
+            if (lastMsg.equals("CHKQ")) {
+                continue;
             }
 
             transmitMsg("GETS Avail " + redyPieces[4] + " " + redyPieces[5] + " " + redyPieces[6]);
@@ -86,23 +92,35 @@ public class Stage2 {
 
             // Send OK to recieve the list of Servers
             transmitMsg("OK");
+            // Capture the first line to check if there are servers are available
+            String availString = this.inputStream.readLine();
+
+            if (availString.equals(".")) {
+                isNotAvail = true;
+                transmitMsg("OK");
+                this.inputStream.readLine();
+                this.inputStream.readLine();
+            }
             // if there are not any available servers, continue through the code and assign
             // the job to the global queue
+
             if (isNotAvail) {
                 transmitMsg("ENQJ GQ"); // enqueue the job into the global queue
+                this.inputStream.readLine();
 
             } else {
                 for (int i = 0; i < totalServers; i++) {
                     // Receive each record
-                    recordString = this.inputStream.readLine();
-                    if (recordString.equals(".")){
-                        isNotAvail = true;
-                        continue;
+                    if (i == 0) {
+                        recordString = availString;
+                    } else {
+                        recordString = this.inputStream.readLine();
                     }
+
                     String recordPieces[] = recordString.split(" ");
                     if (i == 0) {
                         serverNum = recordPieces[1];
-
+                        serverType = recordPieces[0];
                     }
 
                 }
@@ -111,7 +129,7 @@ public class Stage2 {
                 // Get the "." in return
                 this.inputStream.readLine();
 
-                if (lastMsg.equals("JOBN")) {
+                if (lastMsg.equals("JOBN") || lastMsg.equals("JOBP")) {
                     // Schedule a job
                     transmitMsg("SCHD " + jobNum + " " + serverType + " " + serverNum);
                     // Increment Job Number and Server ID
