@@ -17,7 +17,6 @@ public class Stage2 {
     String serverType = "";
     String serverNum = "";
 
-    int jobNum = 0;
     int totalServers = 0;
 
     boolean isNotAvail = false;
@@ -61,17 +60,18 @@ public class Stage2 {
             lastMsg = redyPieces[0];
 
             if (lastMsg.equals("JCPL")) {
-                // Need to say REDY again, skip through the rest of the loop
+                // Make sure there are no awaiting jobs in the queue after a server has been
+                // opened up
                 transmitMsg("LSTQ GQ #");
                 String listTotalString = this.inputStream.readLine();
                 String listTotalPieces[] = listTotalString.split("");
                 int listTotal = Integer.parseInt(listTotalPieces[0]);
 
                 if (listTotal == 0) {
-                    isNotAvail = false;
+                    isNotAvail = false; // There are servers waiting for new jobs, but no jobs in the queue
                     continue;
                 } else {
-                    transmitMsg("DEQJ GQ 0");
+                    transmitMsg("DEQJ GQ 0"); // Dequeue the job from the queue, FCFS, so the first leaves first
                     isNotAvail = false;
                     this.inputStream.readLine();
                     continue;
@@ -79,11 +79,15 @@ public class Stage2 {
 
             }
             if (lastMsg.equals("NONE")) {
-                break;
+                break; // Leave the loop
             }
             if (lastMsg.equals("CHKQ")) {
-                continue;
+                continue; //Just checking the queue, continue through the loop
             }
+
+            int jobNum = Integer.parseInt(redyPieces[2]); // Catch the jobNum in case there are servers with less
+                                                          // resource requirements that can take a server, but are ahead
+                                                          // of larger servers in the job list
 
             transmitMsg("GETS Avail " + redyPieces[4] + " " + redyPieces[5] + " " + redyPieces[6]);
             dataString = this.inputStream.readLine();
@@ -96,23 +100,30 @@ public class Stage2 {
             String availString = this.inputStream.readLine();
 
             if (availString.equals(".")) {
-                isNotAvail = true;
+                isNotAvail = true; // There are no servers available
                 transmitMsg("OK");
                 this.inputStream.readLine();
-                this.inputStream.readLine();
+            } else {
+                isNotAvail = false; // There must be servers available
             }
+
             // if there are not any available servers, continue through the code and assign
             // the job to the global queue
 
             if (isNotAvail) {
                 transmitMsg("ENQJ GQ"); // enqueue the job into the global queue
                 this.inputStream.readLine();
-
+                transmitMsg("OK");
+                for (int i = 0; i < 3; i++) {
+                    this.inputStream.readLine();
+                } // To ensure that i recieve the correct REDY message after the ENQJ, must have
+                  // this in place
             } else {
                 for (int i = 0; i < totalServers; i++) {
-                    // Receive each record
+                    // Receive each record but only use the first recieved (FCFS)
                     if (i == 0) {
-                        recordString = availString;
+                        recordString = availString; // Make sure that the record string manages to grab the first server
+                                                    // even after the check
                     } else {
                         recordString = this.inputStream.readLine();
                     }
@@ -130,7 +141,7 @@ public class Stage2 {
                 this.inputStream.readLine();
 
                 if (lastMsg.equals("JOBN") || lastMsg.equals("JOBP")) {
-                    // Schedule a job
+                    // Schedule a job for either a new or returning job
                     transmitMsg("SCHD " + jobNum + " " + serverType + " " + serverNum);
                     // Increment Job Number and Server ID
                     jobNum += 1;
